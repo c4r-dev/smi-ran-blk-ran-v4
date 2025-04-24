@@ -4,8 +4,8 @@ import './globals.css'; // Import global styles
 import FaviconButton from "./components/FaviconButton";
 
 export const metadata: Metadata = {
-  title: 'Block Randomization',
-  description: 'Visualization of block randomization',
+  title: 'Block Randomization Tool',
+  description: 'Learn block randomization interactively',
 };
 
 // Define the props type including children
@@ -24,7 +24,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
           <FaviconButton />
           <div className="title-container">
             <h1 className="title">
-              Block Randomization
+              Block Randomization Tool
             </h1>
           </div>
         </header>
