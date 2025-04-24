@@ -1,7 +1,6 @@
 // app/layout.tsx
 'use client'; // <-- Add this line to make it a Client Component
 
-import type { Metadata } from "next"; // Metadata type can still be used
 import Image from 'next/image';
 import "./globals.css"; // Import global styles
 
