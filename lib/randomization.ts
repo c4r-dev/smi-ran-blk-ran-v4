@@ -10,13 +10,10 @@ function shuffle<T>(array: T[]): T[] {
   let currentIndex = array.length;
   let randomIndex;
 
-  // While there remain elements to shuffle.
   while (currentIndex !== 0) {
-    // Pick a remaining element.
     randomIndex = Math.floor(Math.random() * currentIndex);
     currentIndex--;
 
-    // And swap it with the current element.
     [array[currentIndex], array[randomIndex]] = [
       array[randomIndex],
       array[currentIndex],
@@ -67,20 +64,17 @@ export function generateBlockedRandomization(
   const assignmentsPerTreatmentPerBlock = blockSize / numTreatments;
   const fullSequence: RandomizationResult[] = [];
 
-  // Create and shuffle each block
   for (let i = 0; i < numBlocks; i++) {
-    let currentBlockTemplate: string[] = [];
-    // Create the template for one block
+    // Use const since it's not reassigned within the loop iteration
+    const currentBlockTemplate: string[] = []; // <-- Changed let to const
     treatmentLabels.forEach((label) => {
       for (let j = 0; j < assignmentsPerTreatmentPerBlock; j++) {
         currentBlockTemplate.push(label);
       }
     });
 
-    // Shuffle the current block
     const shuffledBlock = shuffle(currentBlockTemplate);
 
-    // Add the shuffled block to the full sequence with block index
     shuffledBlock.forEach((treatment) => {
       fullSequence.push({ treatment: treatment, blockIndex: i });
     });

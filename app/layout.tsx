@@ -1,8 +1,10 @@
 // app/layout.tsx
-'use client'; // <-- Add this line to make it a Client Component
+'use client'; // Keep this
 
+// import type { Metadata } from "next"; // <-- Remove this line
 import Image from 'next/image';
 import "./globals.css"; // Import global styles
+
 
 export default function RootLayout({
   children,
@@ -10,26 +12,23 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
 
-  // Function to handle the click and reload the page
   const handleResetClick = () => {
-    window.location.reload(); // Reloads the current page
+    window.location.reload();
   };
 
   return (
     <html lang="en">
-       {/* You might want to set the title dynamically using useEffect or a state management library if needed */}
        <head>
          <title>Block Randomization Tool</title>
-         <meta name="Learn block randomization interactively" content="Learn block randomization interactively" />
-         {/* Add other head elements like favicons here */}
+         <meta name="description" content="Learn block randomization interactively" />
          <link rel="icon" href="/favicon.ico" sizes="any" />
        </head>
       <body>
         <header className="header"> {/* Header class from globals.css */}
            <button
              className="favicon-button" // Favicon button class
-             onClick={handleResetClick} // <-- Add onClick handler
-             title="Reset Application" // Add a tooltip for clarity
+             onClick={handleResetClick}
+             title="Reset Application"
             >
              <Image
                src="/favicon.ico"
@@ -37,7 +36,7 @@ export default function RootLayout({
                width={40}
                height={40}
                className="favicon" // Favicon class
-               priority // Add priority if it's important for LCP
+               priority
              />
            </button>
            <div className="title-container"> {/* Title container class */}
