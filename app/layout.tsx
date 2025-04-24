@@ -1,12 +1,19 @@
+import type { Metadata } from 'next';
+import React from 'react';
 import './globals.css'; // Import global styles
 import FaviconButton from "./components/FaviconButton";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: 'Block Randomization',
   description: 'Visualization of block randomization',
 };
 
-export default function RootLayout({ children }) {
+// Define the props type including children
+interface RootLayoutProps {
+  children: React.ReactNode;
+}
+
+export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="en">
       <head>
