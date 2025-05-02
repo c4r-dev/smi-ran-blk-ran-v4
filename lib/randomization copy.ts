@@ -1,5 +1,6 @@
 // lib/randomization.ts
 
+// --- Updated Interface ---
 export interface RandomizationResult {
   treatment: string; // e.g., 'A', 'B'
   blockIndex: number; // 0, 1, 2...
@@ -24,42 +25,26 @@ function shuffle<T>(array: T[]): T[] {
   return array;
 }
 
-// Function to generate treatment labels (A, B, C... up to J)
+// Function to generate treatment labels (A, B, C...)
 function generateTreatmentLabels(numTreatments: number): string[] {
   const labels: string[] = [];
-  const count = Math.min(numTreatments, 10);
-  for (let i = 0; i < count; i++) {
+  for (let i = 0; i < numTreatments; i++) {
     labels.push(String.fromCharCode(65 + i)); // 65 is ASCII for 'A'
   }
   return labels;
 }
 
-// Updated function to generate randomized blocks
+// --- Updated function to generate randomized blocks ---
 export function generateBlockedRandomization(
   numSubjects: number,
   numBlocks: number,
   numTreatments: number
+  // --- Updated return type ---
 ): { sequence: RandomizationResult[]; error?: string; blockSize?: number } {
-  // --- Input Validation (Updated Block Range) ---
-  // Check basic positivity first (Treatments >= 1 technically, but range check handles < 2)
+  // --- Input Validation ---
   if (numSubjects <= 0 || numBlocks <= 0 || numTreatments <= 0) {
-     // This check is slightly redundant now due to specific range checks below,
-     // but good as a basic sanity check.
     return { sequence: [], error: 'Subjects, blocks, and treatments must be positive numbers.' };
   }
-  // Check specific ranges
-  if (numSubjects < 2 || numSubjects > 500) {
-     return { sequence: [], error: 'Number of Subjects must be between 2 and 500.' };
-  }
-   // --- Updated minimum check for blocks ---
-  if (numBlocks < 2) {
-    return { sequence: [], error: 'Number of Blocks must be 2 or greater.' };
-  }
-  if (numTreatments < 2 || numTreatments > 10) {
-    return { sequence: [], error: 'Number of Treatments must be between 2 and 10.' };
-  }
-
-  // --- Divisibility Checks ---
   if (numSubjects % numBlocks !== 0) {
     return {
       sequence: [],
@@ -73,12 +58,15 @@ export function generateBlockedRandomization(
       error: `Block size (${blockSize}, calculated as Subjects/Blocks) must be divisible by the number of treatments (${numTreatments}).`,
     };
   }
+   if (numTreatments > 26) {
+     return { sequence: [], error: 'Maximum number of treatments supported is 26 (A-Z).' };
+   }
 
   // --- Randomization Logic ---
   const treatmentLabels = generateTreatmentLabels(numTreatments);
   const assignmentsPerTreatmentPerBlock = blockSize / numTreatments;
-  const fullSequence: RandomizationResult[] = [];
-  let overallSubjectIndex = 0;
+  const fullSequence: RandomizationResult[] = []; // Use updated interface
+  let overallSubjectIndex = 0; // Initialize overall subject counter
 
   for (let i = 0; i < numBlocks; i++) {
     const currentBlockTemplate: string[] = [];
@@ -90,13 +78,14 @@ export function generateBlockedRandomization(
 
     const shuffledBlock = shuffle(currentBlockTemplate);
 
+    // --- Assign subjectIndex when adding to sequence ---
     shuffledBlock.forEach((treatment) => {
       fullSequence.push({
         treatment: treatment,
         blockIndex: i,
-        subjectIndex: overallSubjectIndex
+        subjectIndex: overallSubjectIndex // Assign current index
       });
-      overallSubjectIndex++;
+      overallSubjectIndex++; // Increment for the next subject
     });
   }
 

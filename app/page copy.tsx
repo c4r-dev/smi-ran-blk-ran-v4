@@ -15,11 +15,7 @@ const treatmentColors: { [key: string]: string } = {
   'D': '#FFF9C4', // Light Yellow
   'E': '#FCE4EC', // Light Pink
   'F': '#D1C4E9', // Light Purple
-  'G': '#C8E6C9', // Light Green
-  'H': '#FFCCBC', // Light Deep Orange
-  'I': '#CFD8DC', // Light Blue Grey
-  'J': '#D7CCC8', // Light Brown
-  // Only define up to J (10 treatments)
+  // Add more letters and colors if you expect more treatments
 };
 const defaultTreatmentColor = '#E0E0E0'; // Grey for any unexpected treatment
 
@@ -28,40 +24,31 @@ function getColorForTreatment(treatment: string): string {
   return treatmentColors[treatment] || defaultTreatmentColor;
 }
 
-// Use imported RandomizationResult type
+// No longer need CorrectedRandomizationResult interface, use imported RandomizationResult
+// interface CorrectedRandomizationResult {
+//     blockIndex: number;
+//     treatment: string;
+//     subjectIndex: number; // Add subjectIndex here
+// }
+
+
 export default function Home() {
   const [numSubjectsInput, setNumSubjectsInput] = useState<string>('24');
-  const [numBlocksInput, setNumBlocksInput] = useState<string>('2');
+  const [numBlocksInput, setNumBlocksInput] = useState<string>('4');
   const [numTreatmentsInput, setNumTreatmentsInput] = useState<string>('3');
+  // --- Use the imported RandomizationResult type ---
   const [randomizedSequence, setRandomizedSequence] = useState<RandomizationResult[]>([]);
   const [error, setError] = useState<string>('');
   const [generatedBlockSize, setGeneratedBlockSize] = useState<number | null>(null);
-  const [generatedNumTreatments, setGeneratedNumTreatments] = useState<number | null>(null);
-
 
   const handleGenerate = () => {
     setError('');
     setRandomizedSequence([]);
     setGeneratedBlockSize(null);
-    setGeneratedNumTreatments(null);
 
     const numSubjects = parseInt(numSubjectsInput, 10);
     const numBlocks = parseInt(numBlocksInput, 10);
     const numTreatments = parseInt(numTreatmentsInput, 10);
-
-    // Frontend check for ranges
-    if (numSubjects < 2 || numSubjects > 500) {
-      setError('Number of Subjects must be between 2 and 500.');
-      return;
-    }
-    if (numBlocks < 2) {
-        setError('Number of Blocks must be 2 or greater.');
-        return;
-    }
-    if (numTreatments < 2 || numTreatments > 10) {
-      setError('Number of Treatments must be between 2 and 10.');
-      return;
-    }
 
     const result = generateBlockedRandomization(
       numSubjects,
@@ -72,9 +59,9 @@ export default function Home() {
     if (result.error) {
       setError(result.error);
     } else if (result.sequence && result.sequence.length > 0) {
-      setRandomizedSequence(result.sequence);
+      // --- Ensure the state update uses the correct type ---
+      setRandomizedSequence(result.sequence); // No need for 'as' if types match
       setGeneratedBlockSize(result.blockSize ?? null);
-      setGeneratedNumTreatments(numTreatments);
     } else {
       setError('Failed to generate sequence. Please check inputs.');
     }
@@ -83,14 +70,17 @@ export default function Home() {
   // Group sequence by block index using useMemo for optimization
   const groupedSequence = useMemo(() => {
     if (!randomizedSequence || randomizedSequence.length === 0) {
+       // --- Ensure map type matches state type ---
       return new Map<number, RandomizationResult[]>();
     }
+     // --- Ensure map type matches state type ---
     const map = new Map<number, RandomizationResult[]>();
     randomizedSequence.forEach((item) => {
       const blockList = map.get(item.blockIndex) || [];
       blockList.push(item);
       map.set(item.blockIndex, blockList);
     });
+    // Sort map by block index (keys) - essential for correct display order
     return new Map([...map.entries()].sort((a, b) => a[0] - b[0]));
   }, [randomizedSequence]);
 
@@ -100,7 +90,7 @@ export default function Home() {
 
       {/* Input fields section (Unchanged) */}
       <div style={{ display: 'flex', gap: '20px', marginBottom: '20px', flexWrap: 'wrap' }}>
-        <div>
+         <div>
           <label htmlFor="numSubjects" style={{ display: 'block', marginBottom: '5px' }}>
             Number of Subjects:
           </label>
@@ -110,8 +100,7 @@ export default function Home() {
             value={numSubjectsInput}
             onChange={(e) => setNumSubjectsInput(e.target.value)}
             placeholder="e.g., 24"
-            min="2"
-            max="500"
+            min="1"
             style={{ width: '100px', padding: '8px', border: '1px solid #ccc', borderRadius: '4px' }}
           />
         </div>
@@ -125,7 +114,7 @@ export default function Home() {
             value={numBlocksInput}
             onChange={(e) => setNumBlocksInput(e.target.value)}
             placeholder="e.g., 4"
-            min="2"
+            min="1"
             style={{ width: '100px', padding: '8px', border: '1px solid #ccc', borderRadius: '4px' }}
           />
         </div>
@@ -139,8 +128,8 @@ export default function Home() {
             value={numTreatmentsInput}
             onChange={(e) => setNumTreatmentsInput(e.target.value)}
             placeholder="e.g., 3"
-            min="2"
-            max="10"
+            min="1"
+            max="26" // Assuming A-Z
             style={{ width: '100px', padding: '8px', border: '1px solid #ccc', borderRadius: '4px' }}
           />
         </div>
@@ -149,37 +138,33 @@ export default function Home() {
       {/* Generate Button (Unchanged) */}
       <button
         onClick={handleGenerate}
-        className="button"
+        className="button" // Assumes button styles are in globals.css
         style={{ padding: '10px 15px', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '1rem', marginBottom: '20px' }}
       >
         Generate Sequence
       </button>
 
       {/* Legend (Unchanged) */}
-      {generatedNumTreatments !== null && (
-          <div style={{ marginTop: '20px', marginBottom: '20px', padding: '10px', border: '1px solid #eee', borderRadius: '4px' }}>
-            <h4 style={{ marginTop: '0', marginBottom: '10px' }}>Legend</h4>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '15px' }}>
-              {Object.entries(treatmentColors)
-                 .slice(0, generatedNumTreatments)
-                 .map(([treatment, color]) => (
-                <div key={treatment} style={{ display: 'flex', alignItems: 'center' }}>
-                  <span
-                    style={{
-                      display: 'inline-block',
-                      width: '18px',
-                      height: '18px',
-                      marginRight: '8px',
-                      backgroundColor: color,
-                      border: '1px solid #ccc',
-                    }}
-                  ></span>
-                  <span>Treatment {treatment}</span>
-                </div>
-              ))}
+      <div style={{ marginTop: '20px', marginBottom: '20px', padding: '10px', border: '1px solid #eee', borderRadius: '4px' }}>
+        <h4 style={{ marginTop: '0', marginBottom: '10px' }}>Legend</h4>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '15px' }}>
+          {Object.entries(treatmentColors).map(([treatment, color]) => (
+            <div key={treatment} style={{ display: 'flex', alignItems: 'center' }}>
+              <span
+                style={{
+                  display: 'inline-block',
+                  width: '18px',
+                  height: '18px',
+                  marginRight: '8px',
+                  backgroundColor: color,
+                  border: '1px solid #ccc', // Add border for lighter colors
+                }}
+              ></span>
+              <span>Treatment {treatment}</span>
             </div>
-          </div>
-      )}
+          ))}
+        </div>
+      </div>
 
       {/* Error Message (Unchanged) */}
       {error && (
@@ -188,36 +173,37 @@ export default function Home() {
         </p>
       )}
 
-      {/* --- Output Section (SUBJECT BOX STYLE MODIFIED) --- */}
+      {/* --- Output Section (MODIFIED) --- */}
       {groupedSequence.size > 0 && (
         <div style={{ marginTop: '20px' }}>
           <h3>
             Generated Sequence (Total Subjects: {randomizedSequence.length}, Block Size: {generatedBlockSize ?? 'N/A'})
           </h3>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}> {/* Container for blocks */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}> {/* Column layout for blocks */}
             {Array.from(groupedSequence.entries()).map(([blockIndex, blockItems]) => (
-              <div key={blockIndex} style={{ display: 'flex', alignItems: 'center', gap: '10px' }}> {/* Row for single block */}
+              <div key={blockIndex} style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 {/* Block Label */}
                 <span style={{ fontWeight: 'bold', minWidth: '70px', textAlign: 'right' }}>
                   Block {blockIndex + 1}:
                 </span>
                 {/* Treatments within the block */}
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '3px', fontFamily: "'JetBrains Mono', monospace", lineHeight: '1.6' }}>
-                  {blockItems.map((item: RandomizationResult, itemIndex: number) => (
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '3px', fontFamily: 'JetBrains Mono, monospace', lineHeight: '1.6' }}>
+                  {blockItems.map((item, itemIndex) => ( // item now includes subjectIndex
                     <span
-                      key={`${blockIndex}-${itemIndex}`}
-                      // --- Style updated: Removed minWidth, added fixed width ---
+                      key={`${blockIndex}-${itemIndex}`} // More robust key
                       style={{
                         display: 'inline-block',
-                        padding: '3px 6px', // Keeps internal padding
+                        padding: '3px 6px',
                         borderRadius: '3px',
-                        backgroundColor: getColorForTreatment(item.treatment),
+                        backgroundColor: getColorForTreatment(item.treatment), // Color still based on treatment
                         border: '1px solid #ccc',
-                        width: '40px',      // Set fixed width
-                        textAlign: 'center' // Center number within the fixed width
+                        minWidth: '25px', // May need adjustment depending on number size
+                        textAlign: 'center'
                       }}
+                      // --- Updated title (tooltip) ---
                       title={`Subject ${item.subjectIndex + 1}: Treatment ${item.treatment}, Block ${item.blockIndex + 1}`}
                     >
+                      {/* --- MODIFIED CONTENT: Show subject number (1-based) --- */}
                       {item.subjectIndex + 1}
                     </span>
                   ))}
@@ -225,6 +211,7 @@ export default function Home() {
               </div>
             ))}
           </div>
+          {/* Updated explanatory text */}
           <p style={{ fontSize: '0.9em', color: '#555', marginTop: '15px' }}>
              Each row represents a block. Within each block, subjects (numbers) are assigned treatments (indicated by color). Hover over a subject number to see its details.
           </p>
