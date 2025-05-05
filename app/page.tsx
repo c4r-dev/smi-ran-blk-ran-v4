@@ -31,7 +31,7 @@ function getColorForTreatment(treatment: string): string {
 // Use imported RandomizationResult type
 export default function Home() {
   const [numSubjectsInput, setNumSubjectsInput] = useState<string>('24');
-  const [numBlocksInput, setNumBlocksInput] = useState<string>('2');
+  const [numBlocksInput, setNumBlocksInput] = useState<string>('6');
   const [numTreatmentsInput, setNumTreatmentsInput] = useState<string>('3');
   const [randomizedSequence, setRandomizedSequence] = useState<RandomizationResult[]>([]);
   const [error, setError] = useState<string>('');
@@ -73,7 +73,7 @@ export default function Home() {
       setError(result.error);
     } else if (result.sequence && result.sequence.length > 0) {
       setRandomizedSequence(result.sequence);
-      setGeneratedBlockSize(result.blockSize ?? null);
+      setGeneratedBlockSize(result.numBlocks ?? null);
       setGeneratedNumTreatments(numTreatments);
     } else {
       setError('Failed to generate sequence. Please check inputs.');
@@ -191,9 +191,9 @@ export default function Home() {
       {/* --- Output Section (SUBJECT BOX STYLE MODIFIED) --- */}
       {groupedSequence.size > 0 && (
         <div style={{ marginTop: '20px' }}>
-          <h3>
-            Generated Sequence (Total Subjects: {randomizedSequence.length}, Block Size: {generatedBlockSize ?? 'N/A'})
-          </h3>
+          <h2>
+            Generated Sequence (Number of Blocks: {generatedBlockSize ?? 'N/A'})
+          </h2>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}> {/* Container for blocks */}
             {Array.from(groupedSequence.entries()).map(([blockIndex, blockItems]) => (
               <div key={blockIndex} style={{ display: 'flex', alignItems: 'center', gap: '10px' }}> {/* Row for single block */}
