@@ -3,7 +3,7 @@
 export interface RandomizationResult {
   treatment: string; // e.g., 'A', 'B'
   blockIndex: number; // 0, 1, 2...
-  subjectIndex: number; // Overall subject index (0-based)
+  subjectIndex: number; // Overall subject index (0-based, relative to actual allocation size)
 }
 
 // Simple Fisher-Yates (Knuth) shuffle algorithm
@@ -11,26 +11,21 @@ function shuffle<T>(array: T[]): T[] {
   let currentIndex = array.length;
   let randomIndex;
 
-  // While there remain elements to shuffle.
   while (currentIndex !== 0) {
-    // Pick a remaining element.
     randomIndex = Math.floor(Math.random() * currentIndex);
     currentIndex--;
 
-    // And swap it with the current element.
     [array[currentIndex], array[randomIndex]] = [
       array[randomIndex],
       array[currentIndex],
     ];
   }
-
   return array;
 }
 
 // Function to generate treatment labels (A, B, C... up to J)
 function generateTreatmentLabels(numTreatments: number): string[] {
   const labels: string[] = [];
-  // Ensure we don't generate more than 10 labels (A-J)
   const count = Math.min(numTreatments, 10);
   for (let i = 0; i < count; i++) {
     labels.push(String.fromCharCode(65 + i)); // 65 is ASCII for 'A'
@@ -38,47 +33,53 @@ function generateTreatmentLabels(numTreatments: number): string[] {
   return labels;
 }
 
+// --- Define clearer return types ---
+type RandomizationSuccessResult = {
+  sequence: RandomizationResult[];
+  targetSampleSize: number;      // The user's requested number of subjects
+  actualAllocationSize: number;  // The total size generated (multiple of blockSize)
+  numBlocks: number;             // The number of blocks generated
+  blockSize: number;             // The block size used
+  numTreatments: number;         // The number of treatments used
+  warning?: string;              // Optional warning if size was adjusted
+};
+
+type RandomizationErrorResult = {
+  sequence: [];
+  error: string;
+};
+
+
 /**
- * Generates a blocked randomization sequence.
+ * Generates a blocked randomization sequence, adjusting the total allocation
+ * size upwards to the nearest multiple of the block size if necessary.
  *
- * @param numSubjects The total number of subjects (target sample size).
+ * @param targetNumSubjects The desired target number of subjects.
  * @param blockSize The desired number of subjects within each block.
- * @param numTreatments The number of treatment groups.
- * @returns An object containing the randomization sequence, the calculated number of blocks, or an error message.
+ * Must be divisible by numTreatments.
+ * @param numTreatments The number of treatment groups (2-10).
+ * @returns An object containing the randomization sequence and details, or an error.
  */
 export function generateBlockedRandomization(
-  numSubjects: number,
-  blockSize: number, // Input is now blockSize
+  targetNumSubjects: number, // Renamed for clarity
+  blockSize: number,
   numTreatments: number
-): { sequence: RandomizationResult[]; error?: string; numBlocks?: number } { // Returns calculated numBlocks
+): RandomizationSuccessResult | RandomizationErrorResult {
 
   // --- Input Validation ---
-  // Validate range for Number of Subjects
-  if (numSubjects < 2 || numSubjects > 500) {
-     return { sequence: [], error: 'Number of Subjects must be between 2 and 500.' };
+  if (targetNumSubjects < 2 || targetNumSubjects > 500) { // Validate target size
+     return { sequence: [], error: 'Target Sample Size must be between 2 and 500.' };
   }
-  // Validate range for Number of Treatments
   if (numTreatments < 2 || numTreatments > 10) {
     return { sequence: [], error: 'Number of Treatments must be between 2 and 10.' };
   }
-   // Validate Block Size input
   if (blockSize <= 0) {
      return { sequence: [], error: 'Block Size must be a positive number.' };
   }
-  // Block size must be large enough to contain at least one of each treatment
   if (blockSize < numTreatments) {
     return { sequence: [], error: `Block Size (${blockSize}) must be greater than or equal to the number of treatments (${numTreatments}).` };
   }
-
-  // --- Divisibility Checks ---
-  // Check 1: Target Sample Size must be divisible by Block Size
-  if (numSubjects % blockSize !== 0) {
-    return {
-      sequence: [],
-      error: `Number of subjects (${numSubjects}) must be divisible by the block size (${blockSize}). The result must be a whole number for the number of blocks.`,
-    };
-  }
-   // Check 2: Block Size must be divisible by Number of Treatments
+  // Check: Block Size must be divisible by Number of Treatments
   if (blockSize % numTreatments !== 0) {
     return {
       sequence: [],
@@ -86,20 +87,27 @@ export function generateBlockedRandomization(
     };
   }
 
-  // --- Calculate Number of Blocks ---
-  // This is derived based on user input for numSubjects and blockSize
-  const numBlocks = numSubjects / blockSize;
+  // --- Calculate Actual Allocation Size and Number of Blocks ---
+  let warningMessage: string | undefined = undefined;
+  // Calculate the number of blocks needed, rounding up
+  const numBlocks = Math.ceil(targetNumSubjects / blockSize);
+  // Calculate the actual total number of subjects to allocate for (a multiple of blockSize)
+  const actualAllocationSize = numBlocks * blockSize;
+
+  // Set a warning if the size was adjusted
+  if (actualAllocationSize !== targetNumSubjects) {
+      warningMessage = `Target sample size (${targetNumSubjects}) is not a multiple of block size (${blockSize}). Allocation generated for ${actualAllocationSize} subjects.`;
+  }
+
 
   // --- Randomization Logic ---
   const treatmentLabels = generateTreatmentLabels(numTreatments);
-  // Calculate how many times each treatment appears in a single block
   const assignmentsPerTreatmentPerBlock = blockSize / numTreatments;
   const fullSequence: RandomizationResult[] = [];
-  let overallSubjectIndex = 0; // Keep track of the subject number across all blocks
+  let overallSubjectIndex = 0;
 
-  // Generate each block
+  // Generate each block using the calculated numBlocks
   for (let i = 0; i < numBlocks; i++) {
-    // Create the template for the current block (contains the required number of each treatment label)
     const currentBlockTemplate: string[] = [];
     treatmentLabels.forEach((label) => {
       for (let j = 0; j < assignmentsPerTreatmentPerBlock; j++) {
@@ -107,20 +115,38 @@ export function generateBlockedRandomization(
       }
     });
 
-    // Shuffle the assignments within the current block
     const shuffledBlock = shuffle(currentBlockTemplate);
 
-    // Add the shuffled assignments to the full sequence
     shuffledBlock.forEach((treatment) => {
       fullSequence.push({
-        treatment: treatment,     // Assigned treatment (e.g., 'A', 'B')
-        blockIndex: i,            // Index of the current block (0-based)
-        subjectIndex: overallSubjectIndex // Overall subject index (0-based)
+        treatment: treatment,
+        blockIndex: i,
+        subjectIndex: overallSubjectIndex
       });
-      overallSubjectIndex++; // Increment for the next subject
+      overallSubjectIndex++;
     });
   }
 
-  // Return the generated sequence and the calculated number of blocks
-  return { sequence: fullSequence, numBlocks: numBlocks };
+  // --- Return Success Result ---
+  // Ensure the sequence length matches the actual allocation size
+  if (fullSequence.length !== actualAllocationSize) {
+      // This should theoretically not happen if logic is correct, but good safeguard
+      return { sequence: [], error: `Internal error: Generated sequence length (${fullSequence.length}) does not match calculated allocation size (${actualAllocationSize}).`};
+  }
+
+  const successResult: RandomizationSuccessResult = {
+      sequence: fullSequence,
+      targetSampleSize: targetNumSubjects,
+      actualAllocationSize: actualAllocationSize,
+      numBlocks: numBlocks,
+      blockSize: blockSize,
+      numTreatments: numTreatments,
+  };
+
+  // Add warning if applicable
+  if (warningMessage) {
+      successResult.warning = warningMessage;
+  }
+
+  return successResult;
 }
