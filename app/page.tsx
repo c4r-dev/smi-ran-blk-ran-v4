@@ -51,11 +51,11 @@ export default function Home() {
 
     // Frontend check for ranges
     if (numSubjects < 2 || numSubjects > 500) {
-      setError('Number of Subjects must be between 2 and 500.');
+      setError('Target Sample Size must be between 2 and 500.');
       return;
     }
     if (numBlocks < 2) {
-      setError('Number of Blocks must be 2 or greater.');
+      setError('Block Size must be 2 or greater.');
       return;
     }
     if (numTreatments < 2 || numTreatments > 10) {
@@ -102,7 +102,7 @@ export default function Home() {
       <div style={{ display: 'flex', gap: '20px', marginBottom: '20px', flexWrap: 'wrap' }}>
         <div>
           <label htmlFor="numSubjects" style={{ display: 'block', marginBottom: '5px' }}>
-            Number of Subjects:
+            Target Sample Size:
           </label>
           <input
             type="number"
@@ -117,7 +117,7 @@ export default function Home() {
         </div>
         <div>
           <label htmlFor="numBlocks" style={{ display: 'block', marginBottom: '5px' }}>
-            Number of Blocks:
+            Block Size:
           </label>
           <input
             type="number"
@@ -226,8 +226,7 @@ export default function Home() {
             ))}
           </div>
           <p style={{ fontSize: '0.9em', color: '#555', marginTop: '15px' }}>
-            Each row represents a block. Within each block, subjects (numbers) are assigned treatments (indicated by color). Hover over a subject number to see its details.
-          </p>
+          Each row represents a block. One of all the possible permutations of treatment allocations for this block size is randomly assigned for each block. Colors indicate the treatment.</p>
         </div>
       )}
       {/* --- End Output Section --- */}
