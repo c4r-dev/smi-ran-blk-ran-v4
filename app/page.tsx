@@ -31,8 +31,8 @@ function getColorForTreatment(treatment: string): string {
 export default function Home() {
   // --- State Variables ---
   const [numSubjectsInput, setNumSubjectsInput] = useState<string>('24');
-  const [blockSizeInput, setBlockSizeInput] = useState<string>('10');
-  const [numTreatmentsInput, setNumTreatmentsInput] = useState<string>('2');
+  const [blockSizeInput, setBlockSizeInput] = useState<string>('6');
+  const [numTreatmentsInput, setNumTreatmentsInput] = useState<string>('3');
 
   const [randomizedSequence, setRandomizedSequence] = useState<RandomizationResult[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -43,11 +43,11 @@ export default function Home() {
 
   // State to store details from successful generation
   const [generationDetails, setGenerationDetails] = useState<{
-     targetSampleSize?: number;
-     actualAllocationSize?: number;
-     numBlocks?: number;
-     blockSize?: number;
-     numTreatments?: number;
+    targetSampleSize?: number;
+    actualAllocationSize?: number;
+    numBlocks?: number;
+    blockSize?: number;
+    numTreatments?: number;
   } | null>(null);
 
 
@@ -70,8 +70,8 @@ export default function Home() {
 
     // --- Frontend Input Validation (Basic Checks) ---
     if (isNaN(targetNumSubjects) || isNaN(blockSize) || isNaN(numTreatments)) {
-        setError("Please ensure all inputs are valid numbers.");
-        return;
+      setError("Please ensure all inputs are valid numbers.");
+      return;
     }
     if (targetNumSubjects < 2 || targetNumSubjects > 500) {
       setError('Target Sample Size must be between 2 and 500.');
@@ -231,7 +231,7 @@ export default function Home() {
         </p>
       )}
 
-       {/* --- Display Warning --- */}
+      {/* --- Display Warning --- */}
       {warning && (
         <p style={{ color: 'orange', marginTop: '15px', fontWeight: 'bold' }}>
           Warning: {warning}
@@ -242,13 +242,13 @@ export default function Home() {
       {groupedSequence.size > 0 && generationDetails && (
         <div style={{ marginTop: '20px' }}>
           <h2>Generated Sequence Details</h2>
-           <p style={{ fontSize: '0.9em', color: '#333', marginTop: '5px', marginBottom: '15px' }}>
-                Target Sample Size: {generationDetails.targetSampleSize ?? 'N/A'} |
-                Actual Allocation Size: {generationDetails.actualAllocationSize ?? 'N/A'} |
-                Number of Blocks: {generationDetails.numBlocks ?? 'N/A'} | {/* Correctly uses generationDetails */}
-                Block Size Used: {generationDetails.blockSize ?? 'N/A'} |
-                Treatments: {generationDetails.numTreatments ?? 'N/A'}
-            </p>
+          <p style={{ fontSize: '0.9em', color: '#333', marginTop: '5px', marginBottom: '15px' }}>
+            Target Sample Size: {generationDetails.targetSampleSize ?? 'N/A'} |
+            Actual Allocation Size: {generationDetails.actualAllocationSize ?? 'N/A'} |
+            Number of Blocks: {generationDetails.numBlocks ?? 'N/A'} | {/* Correctly uses generationDetails */}
+            Block Size Used: {generationDetails.blockSize ?? 'N/A'} |
+            Treatments: {generationDetails.numTreatments ?? 'N/A'}
+          </p>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}> {/* Container for blocks */}
             {Array.from(groupedSequence.entries()).map(([blockIndex, blockItems]) => (
@@ -281,8 +281,9 @@ export default function Home() {
               </div>
             ))}
           </div>
-          <p style={{ fontSize: '0.8em', color: '#555', marginTop: '15px' }}>
-              Each row represents a block. Allocations within each block are randomly permuted. Colors indicate the assigned treatment group. Subject Index is the overall position in the generated sequence.
+          {/* --- End of Blocks --- */}
+          <p style={{ fontSize: '0.9em', color: '#555', marginTop: '15px' }}>
+            Each row represents a block. One of all the possible permutations of treatment allocations for this block size is randomly assigned for each block.
           </p>
         </div>
       )}
