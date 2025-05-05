@@ -95,8 +95,8 @@ export default function Home() {
   }, [randomizedSequence]);
 
   return (
-    <div style={{ padding: '20px', maxWidth: '800px', margin: '80px auto 20px auto' }}>
-      <h2>Block Randomization Generator</h2>
+    <div style={{ padding: '20px', maxWidth: '800px', margin: '40px auto 20px auto' }}>
+      {/* <h2>Block Randomization Generator</h2> */}
 
       {/* Input fields section (Unchanged) */}
       <div style={{ display: 'flex', gap: '20px', marginBottom: '20px', flexWrap: 'wrap' }}>
@@ -225,8 +225,10 @@ export default function Home() {
               </div>
             ))}
           </div>
-          <p style={{ fontSize: '0.9em', color: '#555', marginTop: '15px' }}>
-          Each row represents a block. One of all the possible permutations of treatment allocations for this block size is randomly assigned for each block. Colors indicate the treatment.</p>
+          <h2>
+            <p style={{ fontSize: '0.8em', color: '#555', marginTop: '15px' }}>
+              Each row represents a block. One of all the possible permutations of treatment allocations for this block size is randomly assigned for each block. Colors indicate the treatment.</p>
+          </h2>
         </div>
       )}
       {/* --- End Output Section --- */}
