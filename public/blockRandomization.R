@@ -1,6 +1,9 @@
 # Install required packages
-# Consider running install.packages only once interactively, not in the script
-install.packages(c("blockrand", "tidyverse")) # Included as requested
+# Specify a CRAN mirror and conform to lintr style suggestions
+install.packages(
+  c("blockrand", "tidyverse"),
+  repos = "https://cloud.r-project.org/" # Use spaces around = and double quotes
+)
 
 # Load required packages
 library(blockrand)
