@@ -5,7 +5,7 @@ import React, { useState, useMemo } from 'react';
 import {
   generateBlockedRandomization,
   RandomizationResult, // Import the updated interface from lib
-} from '../lib/randomization'; // Assuming this path is correct
+} from '../lib/randomization'; // review path
 
 // --- Define colors for treatments (adjust colors as needed) ---
 const treatmentColors: { [key: string]: string } = {
@@ -55,8 +55,8 @@ export default function Home() {
       return;
     }
     if (numBlocks < 2) {
-        setError('Number of Blocks must be 2 or greater.');
-        return;
+      setError('Number of Blocks must be 2 or greater.');
+      return;
     }
     if (numTreatments < 2 || numTreatments > 10) {
       setError('Number of Treatments must be between 2 and 10.');
@@ -157,12 +157,12 @@ export default function Home() {
 
       {/* Legend (Unchanged) */}
       {generatedNumTreatments !== null && (
-          <div style={{ marginTop: '20px', marginBottom: '20px', padding: '10px', border: '1px solid #eee', borderRadius: '4px' }}>
-            <h4 style={{ marginTop: '0', marginBottom: '10px' }}>Legend</h4>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '15px' }}>
-              {Object.entries(treatmentColors)
-                 .slice(0, generatedNumTreatments)
-                 .map(([treatment, color]) => (
+        <div style={{ marginTop: '20px', marginBottom: '20px', padding: '10px', border: '1px solid #eee', borderRadius: '4px' }}>
+          <h4 style={{ marginTop: '0', marginBottom: '10px' }}>Legend</h4>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '15px' }}>
+            {Object.entries(treatmentColors)
+              .slice(0, generatedNumTreatments)
+              .map(([treatment, color]) => (
                 <div key={treatment} style={{ display: 'flex', alignItems: 'center' }}>
                   <span
                     style={{
@@ -177,8 +177,8 @@ export default function Home() {
                   <span>Treatment {treatment}</span>
                 </div>
               ))}
-            </div>
           </div>
+        </div>
       )}
 
       {/* Error Message (Unchanged) */}
@@ -226,7 +226,7 @@ export default function Home() {
             ))}
           </div>
           <p style={{ fontSize: '0.9em', color: '#555', marginTop: '15px' }}>
-             Each row represents a block. Within each block, subjects (numbers) are assigned treatments (indicated by color). Hover over a subject number to see its details.
+            Each row represents a block. Within each block, subjects (numbers) are assigned treatments (indicated by color). Hover over a subject number to see its details.
           </p>
         </div>
       )}
