@@ -5,8 +5,6 @@ import React, { useState, useMemo } from 'react';
 import {
   generateBlockedRandomization,
   RandomizationResult,
-  // Assuming randomization.ts exports these types now:
-  // RandomizationSuccessResult, RandomizationErrorResult
 } from '../lib/randomization'; // review path if necessary
 
 // --- Define colors for treatments (adjust colors as needed) ---
@@ -33,16 +31,14 @@ function getColorForTreatment(treatment: string): string {
 export default function Home() {
   // --- State Variables ---
   const [numSubjectsInput, setNumSubjectsInput] = useState<string>('24');
-  // Changed from numBlocksInput to blockSizeInput
   const [blockSizeInput, setBlockSizeInput] = useState<string>('10');
   const [numTreatmentsInput, setNumTreatmentsInput] = useState<string>('2');
 
   const [randomizedSequence, setRandomizedSequence] = useState<RandomizationResult[]>([]);
-  const [error, setError] = useState<string | null>(null); // Use null for no error
-  const [warning, setWarning] = useState<string | null>(null); // State for warnings
+  const [error, setError] = useState<string | null>(null);
+  const [warning, setWarning] = useState<string | null>(null);
 
-  // Renamed from generatedBlockSize to generatedNumBlocks
-  const [generatedNumBlocks, setGeneratedNumBlocks] = useState<number | null>(null);
+  // REMOVED unused state: const [generatedNumBlocks, setGeneratedNumBlocks] = useState<number | null>(null);
   const [generatedNumTreatments, setGeneratedNumTreatments] = useState<number | null>(null);
 
   // State to store details from successful generation
@@ -59,17 +55,16 @@ export default function Home() {
   const handleGenerate = () => {
     // Clear previous results/errors/warnings
     setError(null);
-    setWarning(null); // Clear warning
+    setWarning(null);
     setRandomizedSequence([]);
-    setGeneratedNumBlocks(null); // Clear generated number of blocks
-    setGeneratedNumTreatments(null); // Clear treatments for legend
-    setGenerationDetails(null); // Clear details
+    // REMOVED: setGeneratedNumBlocks(null);
+    setGeneratedNumTreatments(null);
+    setGenerationDetails(null);
 
 
     // --- Input Parsing ---
-    // Use const for parsed values within this function scope
     const targetNumSubjects = parseInt(numSubjectsInput, 10);
-    const blockSize = parseInt(blockSizeInput, 10); // Changed from numBlocks
+    const blockSize = parseInt(blockSizeInput, 10);
     const numTreatments = parseInt(numTreatmentsInput, 10);
 
 
@@ -78,17 +73,14 @@ export default function Home() {
         setError("Please ensure all inputs are valid numbers.");
         return;
     }
-    // Ranges checked primarily in the backend function, but basic checks here are good UX
     if (targetNumSubjects < 2 || targetNumSubjects > 500) {
       setError('Target Sample Size must be between 2 and 500.');
       return;
     }
-    // Removed check for numBlocks < 2, now using blockSize
-    if (blockSize <= 0) { // Check if block size is positive
+    if (blockSize <= 0) {
       setError('Block Size must be a positive number.');
       return;
     }
-    // Block size must be >= treatments, but the backend function handles this better with specific values
     if (numTreatments < 2 || numTreatments > 10) {
       setError('Number of Treatments must be between 2 and 10.');
       return;
@@ -98,7 +90,7 @@ export default function Home() {
     // --- Call the updated randomization function ---
     const result = generateBlockedRandomization(
       targetNumSubjects,
-      blockSize, // Pass blockSize here
+      blockSize,
       numTreatments
     );
 
@@ -110,15 +102,15 @@ export default function Home() {
       // Clear other states just in case
       setRandomizedSequence([]);
       setWarning(null);
-      setGeneratedNumBlocks(null);
+      // REMOVED: setGeneratedNumBlocks(null);
       setGeneratedNumTreatments(null);
       setGenerationDetails(null);
     } else {
       // Handle Success Case
-      setError(null); // Clear any previous error
+      setError(null);
       setRandomizedSequence(result.sequence);
-      setGeneratedNumBlocks(result.numBlocks); // Store the calculated number of blocks
-      setGeneratedNumTreatments(result.numTreatments); // Store treatments for legend
+      // REMOVED: setGeneratedNumBlocks(result.numBlocks); // Not needed, info is in generationDetails
+      setGeneratedNumTreatments(result.numTreatments);
       setGenerationDetails({ // Store details
         targetSampleSize: result.targetSampleSize,
         actualAllocationSize: result.actualAllocationSize,
@@ -126,7 +118,6 @@ export default function Home() {
         blockSize: result.blockSize,
         numTreatments: result.numTreatments,
       });
-      // Set warning if it exists in the result
       setWarning(result.warning || null);
     }
   };
@@ -168,17 +159,16 @@ export default function Home() {
           />
         </div>
         <div>
-          {/* Changed Label and Input to Block Size */}
           <label htmlFor="blockSize" style={{ display: 'block', marginBottom: '5px' }}>
             Block Size:
           </label>
           <input
             type="number"
             id="blockSize"
-            value={blockSizeInput} // Use blockSizeInput state
-            onChange={(e) => setBlockSizeInput(e.target.value)} // Use setBlockSizeInput
+            value={blockSizeInput}
+            onChange={(e) => setBlockSizeInput(e.target.value)}
             placeholder="e.g., 10"
-            min="1" // Basic minimum validation
+            min="1"
             style={{ width: '100px', padding: '8px', border: '1px solid #ccc', borderRadius: '4px' }}
           />
         </div>
@@ -202,14 +192,13 @@ export default function Home() {
       {/* --- Generate Button --- */}
       <button
         onClick={handleGenerate}
-        className="button" // Assuming 'button' class exists in globals.css or similar
+        className="button"
         style={{ padding: '10px 15px', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '1rem', marginBottom: '20px' }}
       >
         Generate Sequence
       </button>
 
       {/* --- Legend --- */}
-      {/* Display legend only if generation was successful */}
       {generationDetails && generatedNumTreatments !== null && (
         <div style={{ marginTop: '20px', marginBottom: '20px', padding: '10px', border: '1px solid #eee', borderRadius: '4px' }}>
           <h4 style={{ marginTop: '0', marginBottom: '10px' }}>Legend</h4>
@@ -256,7 +245,7 @@ export default function Home() {
            <p style={{ fontSize: '0.9em', color: '#333', marginTop: '5px', marginBottom: '15px' }}>
                 Target Sample Size: {generationDetails.targetSampleSize ?? 'N/A'} |
                 Actual Allocation Size: {generationDetails.actualAllocationSize ?? 'N/A'} |
-                Number of Blocks: {generationDetails.numBlocks ?? 'N/A'} |
+                Number of Blocks: {generationDetails.numBlocks ?? 'N/A'} | {/* Correctly uses generationDetails */}
                 Block Size Used: {generationDetails.blockSize ?? 'N/A'} |
                 Treatments: {generationDetails.numTreatments ?? 'N/A'}
             </p>
@@ -281,11 +270,10 @@ export default function Home() {
                         border: '1px solid #ccc',
                         width: '40px',
                         textAlign: 'center',
-                        fontSize: '0.9em' // Slightly smaller font for the number maybe
+                        fontSize: '0.9em'
                       }}
                       title={`Subject Index: ${item.subjectIndex + 1} | Treatment: ${item.treatment} | Block: ${item.blockIndex + 1}`}
                     >
-                      {/* Display 1-based subject index relative to actual allocation */}
                       {item.subjectIndex + 1}
                     </span>
                   ))}
