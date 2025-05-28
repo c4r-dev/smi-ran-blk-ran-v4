@@ -145,52 +145,52 @@ export default function Home() {
 
       {/* --- Input fields section --- */}
       {/* Input fields remain the same... */}
-       <div style={{ display: 'flex', gap: '20px', marginBottom: '20px', flexWrap: 'wrap' }}>
-         <div>
-           <label htmlFor="numSubjects" style={{ display: 'block', marginBottom: '5px' }}>
-             Target Sample Size:
-           </label>
-           <input
-             type="number"
-             id="numSubjects"
-             value={numSubjectsInput}
-             onChange={(e) => setNumSubjectsInput(e.target.value)}
-             placeholder="e.g., 24"
-             min="2"
-             max="500"
-             style={{ width: '100px', padding: '8px', border: '1px solid #ccc', borderRadius: '4px' }}
-           />
-         </div>
-         <div>
-           <label htmlFor="blockSize" style={{ display: 'block', marginBottom: '5px' }}>
-             Block Size:
-           </label>
-           <input
-             type="number"
-             id="blockSize"
-             value={blockSizeInput}
-             onChange={(e) => setBlockSizeInput(e.target.value)}
-             placeholder="e.g., 10"
-             min="1"
-             style={{ width: '100px', padding: '8px', border: '1px solid #ccc', borderRadius: '4px' }}
-           />
-         </div>
-         <div>
-           <label htmlFor="numTreatments" style={{ display: 'block', marginBottom: '5px' }}>
-             Number of Treatments:
-           </label>
-           <input
-             type="number"
-             id="numTreatments"
-             value={numTreatmentsInput}
-             onChange={(e) => setNumTreatmentsInput(e.target.value)}
-             placeholder="e.g., 2"
-             min="2"
-             max="10"
-             style={{ width: '100px', padding: '8px', border: '1px solid #ccc', borderRadius: '4px' }}
-           />
-         </div>
-       </div>
+      <div style={{ display: 'flex', gap: '20px', marginBottom: '20px', flexWrap: 'wrap' }}>
+        <div>
+          <label htmlFor="numSubjects" style={{ display: 'block', marginBottom: '5px' }}>
+            Target Sample Size:
+          </label>
+          <input
+            type="number"
+            id="numSubjects"
+            value={numSubjectsInput}
+            onChange={(e) => setNumSubjectsInput(e.target.value)}
+            placeholder="e.g., 24"
+            min="2"
+            max="500"
+            style={{ width: '100px', padding: '8px', border: '1px solid #ccc', borderRadius: '4px' }}
+          />
+        </div>
+        <div>
+          <label htmlFor="blockSize" style={{ display: 'block', marginBottom: '5px' }}>
+            Block Size:
+          </label>
+          <input
+            type="number"
+            id="blockSize"
+            value={blockSizeInput}
+            onChange={(e) => setBlockSizeInput(e.target.value)}
+            placeholder="e.g., 10"
+            min="1"
+            style={{ width: '100px', padding: '8px', border: '1px solid #ccc', borderRadius: '4px' }}
+          />
+        </div>
+        <div>
+          <label htmlFor="numTreatments" style={{ display: 'block', marginBottom: '5px' }}>
+            Number of Treatments:
+          </label>
+          <input
+            type="number"
+            id="numTreatments"
+            value={numTreatmentsInput}
+            onChange={(e) => setNumTreatmentsInput(e.target.value)}
+            placeholder="e.g., 2"
+            min="2"
+            max="10"
+            style={{ width: '100px', padding: '8px', border: '1px solid #ccc', borderRadius: '4px' }}
+          />
+        </div>
+      </div>
 
 
       {/* --- Generate Button --- */}
@@ -206,26 +206,26 @@ export default function Home() {
       {/* NEW: Conditionally render this block based on hasGenerated state */}
       {hasGenerated && (
         <div style={{ display: 'flex', gap: '10px', marginBottom: '20px', alignItems: 'center' }}>
-           <span style={{fontSize: '0.9em', color: '#555'}}>Download code:</span>
-           <a
-             href="/blockRandomization.py" // Using updated filename
-             download
-             className="button button-secondary"
-             style={{ textDecoration: 'none', padding: '8px 12px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.9rem' }}
-             title="Download Python script"
-           >
-             Python (.py)
-           </a>
-           <a
-             href="/blockRandomization.R" // Using updated filename
-             download
-             className="button button-secondary"
-             style={{ textDecoration: 'none', padding: '8px 12px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.9rem' }}
-             title="Download R script"
-           >
-             R (.R)
-           </a>
-         </div>
+          <span style={{ fontSize: '0.9em', color: '#555' }}>Download code:</span>
+          <a
+            href="/blockRandomization.py" // Using updated filename
+            download
+            className="button button-secondary"
+            style={{ textDecoration: 'none', padding: '8px 12px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.9rem' }}
+            title="Download Python script"
+          >
+            Python (.py)
+          </a>
+          <a
+            href="/blockRandomization.R" // Using updated filename
+            download
+            className="button button-secondary"
+            style={{ textDecoration: 'none', padding: '8px 12px', borderRadius: '4px', cursor: 'pointer', fontSize: '0.9rem' }}
+            title="Download R script"
+          >
+            R (.R)
+          </a>
+        </div>
       )}
 
 
@@ -313,7 +313,7 @@ export default function Home() {
             ))}
           </div>
           <p style={{ fontSize: '0.9em', color: '#555', marginTop: '15px' }}>
-            Each row represents a block. One of all the possible permutations of treatment allocations for this block size is randomly assigned for each block.
+            Each row represents a block. One of all the possible permutations of treatment allocations for this block size is randomly assigned for each block. Colors indicate the treatment.
           </p>
         </div>
       )}
