@@ -15,9 +15,9 @@ export default function RandomizationForm({
       <Typography variant="body1" sx={{ mb: 2, color: 'text.secondary' }}>
         When you are setting up block randomization, you have to know sample size, block size and number of treatments, and then standard code can randomize for you. Try it out!
       </Typography>
-      <Stack alignItems="end">
+      <Stack direction="row" alignItems="flex-start" spacing={2} flexWrap="wrap">
         <TextField
-          label="Target Sample Size"
+          label="Sample Size"
           type="number"
           value={numSubjectsInput}
           onChange={(e) => setNumSubjectsInput(e.target.value)}
@@ -36,12 +36,12 @@ export default function RandomizationForm({
           placeholder="e.g., 10"
           inputProps={{ min: 1 }}
           sx={{ 
-            width: { xs: '100%', sm: 100 },
-            maxWidth: { xs: 'none', sm: 100 }
+            width: { xs: '100%', sm: 110 },
+            maxWidth: { xs: 'none', sm: 110 }
           }}
         />
         <TextField
-          label="Number of Treatments"
+          label="Treatments"
           type="number"
           value={numTreatmentsInput}
           onChange={(e) => setNumTreatmentsInput(e.target.value)}
