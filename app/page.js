@@ -4,7 +4,7 @@
 import React, { useState, useMemo } from 'react';
 import { Container } from '@mui/material';
 import { generateBlockedRandomization } from '../lib/randomization';
-import { treatmentColors, appColors } from '../lib/ui/theme/muiTheme';
+import { treatmentColors } from '../lib/ui/theme/muiTheme';
 import RandomizationForm from './components/RandomizationForm';
 import Legend from './components/Legend';
 import DownloadButtons from './components/DownloadButtons';
